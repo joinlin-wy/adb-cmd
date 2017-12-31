@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id="pic" width="360" height="640" style="display: none;"></canvas>
+<img src="" alt="" id="img">
+<button onclick="getPic()">刷新图片</button>
+<button onclick="sendSwipe()">发送事件</button>
+<div id="message"></div>
+<script>
+    var canvas = document.getElementById('pic')
+    var ctx = canvas.getContext('2d')
+    var img = document.getElementById('img')
+    img.width = 360
+    img.height = 640
+    img.src = '/img/0.jpg'
+    img.onload = function () {
+        // ctx.drawImage(img, 0, 0, 360, 640, 0, 0, 360, 640)
+    }
+    function GET(url) {
+        var xhr = new XMLHttpRequest()
+        xhr.open("GET",url,false)
+        xhr.send(null)
+        return xhr.responseText
+    }
+    function getPic() {
+       GET('/getPic')
+        setTimeout(function () {
+            img.src = '/img/0.jpg?rand='+new Date().getTime()
+        },2000)
+
+    }
+    var dp = 1080/360
+    function sendClick() {
+        GET('/click?X='+pos.X*dp+'&Y='+pos.Y*dp)
+        document.getElementById('message').innerText += '点击完成'
+    }
+    function sendSwipe() {
+        var time = parseInt(distance/0.23)
+        GET('/swipe?X='+pos.X*dp+'&Y='+pos.Y*dp+'&time='+time)
+        setTimeout(function () {
+            getPic()
+            document.getElementById('message').innerText += '滑动完成'
+        },3000)
+    }
+    var pos = {X:0,Y:0}
+    var distance = 0
+    img.onclick = function (ev) {
+        var dx = pos.X - ev.offsetX
+        var dy = pos.Y - ev.offsetY
+        distance = parseInt(Math.sqrt(dx*dx + dy*dy))
+        document.getElementById('message').innerText = 'X:'+ev.offsetX
+          +' Y:'+ ev.offsetY + '距离:'+ distance
+        pos.X = ev.offsetX
+        pos.Y = ev.offsetY
+    }
+    document.onkeydown =function (ev) {
+        console.log(ev.keyCode)
+        if(ev.keyCode === 32){
+            sendSwipe()
+        }
+    }
+</script>
+</body>
+</html>
