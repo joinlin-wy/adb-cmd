@@ -24,12 +24,13 @@ app.get('/', function (req, res) {
       })
   })
   .get('/swipe',function (req,res) {
-      var params = req.query
+      let params = req.query
       
       adb.swipe(params.X,params.Y,params.X,params.Y,params.time,function () {
           res.send('ok')
       })
   })
-app.listen(80, function () {
-    console.log("serving on 3000")
+let port = 80
+app.listen(port, function () {
+    console.log(`serving on ${port}`)
 })
